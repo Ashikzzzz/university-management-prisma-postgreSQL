@@ -3,10 +3,10 @@ import { AcademicSemester, PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const createAcademicSemester = async (
-  data: AcademicSemester
+  academicSemesterData: AcademicSemester
 ): Promise<AcademicSemester> => {
   const result = await prisma.academicSemester.create({
-    data,
+    data: academicSemesterData,
   });
   return result;
 };
