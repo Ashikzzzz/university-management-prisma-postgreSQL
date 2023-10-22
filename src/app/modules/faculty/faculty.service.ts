@@ -107,8 +107,25 @@ const getAsingleFaculty = async (id: string): Promise<Faculty | null> => {
   return result;
 };
 
+// update a faculty
+const updateAFaculty = async (
+  id: string,
+  payload: Faculty
+): Promise<Faculty> => {
+  const result = await prisma.faculty.update({
+    where: { id },
+    data: {
+      firstName: payload.firstName,
+      contactNo: payload.contactNo,
+      bloodGroup: payload.bloodGroup,
+    },
+  });
+  return result;
+};
+
 export const facultyService = {
   createFaculty,
   getAllFaculty,
   getAsingleFaculty,
+  updateAFaculty,
 };

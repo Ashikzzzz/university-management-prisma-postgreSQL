@@ -18,4 +18,7 @@ router.post(
   academicFacultyController.createAcademicFaculty
 );
 
+// update a academic faculty
+router.patch('/:id', academicFacultyController.updateAcademicFaculty);
+
 export const academicFacultyRoute = router;

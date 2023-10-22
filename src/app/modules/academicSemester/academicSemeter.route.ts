@@ -17,4 +17,7 @@ router.post(
   academicSemesterController.createAcademicSemester
 );
 
+// update semester
+router.patch('/:id', academicSemesterController.updateSemester);
+
 export const academicSemesterRoute = router;

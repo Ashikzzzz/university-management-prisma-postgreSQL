@@ -107,8 +107,21 @@ const getAsingleSemester = async (
   return result;
 };
 
+// update academic semester
+const updateSemester = async (
+  id: string,
+  payload: AcademicSemester
+): Promise<AcademicSemester> => {
+  const result = await prisma.academicSemester.update({
+    where: { id },
+    data: payload,
+  });
+  return result;
+};
+
 export const academicSemesterService = {
   createAcademicSemester,
   getAllSemesters,
   getAsingleSemester,
+  updateSemester,
 };
