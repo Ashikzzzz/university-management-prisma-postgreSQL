@@ -1,3 +1,4 @@
+import { Faculty } from '@prisma/client';
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import catchAsync from '../../../shared/catchAsync';
@@ -36,7 +37,20 @@ const getAllFaculty = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get a single faculty
+const getAsingleFaculty = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const result = await facultyService.getAsingleFaculty(id);
+  sendResponse<Faculty>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: ' Successful',
+    data: result,
+  });
+});
+
 export const facultyController = {
   createFaculty,
   getAllFaculty,
+  getAsingleFaculty,
 };
