@@ -5,6 +5,9 @@ import { facultyZodValidation } from './faculty.validation';
 
 const router = express.Router();
 
+// get all faculty
+router.get('/', facultyController.getAllFaculty);
+
 // create faculty
 router.post(
   '/create-faculty',
