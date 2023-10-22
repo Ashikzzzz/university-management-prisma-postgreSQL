@@ -5,6 +5,12 @@ import { studentZodValidation } from './student.validation';
 
 const router = express.Router();
 
+// get single studnet
+router.get('/:id', studentController.getAsingleStudent);
+
+// get all student
+router.get('/', studentController.getAllStudents);
+
 // create student
 router.post(
   '/create-student',
