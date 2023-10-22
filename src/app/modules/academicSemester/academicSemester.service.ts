@@ -4,7 +4,9 @@ import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import { IAcademicSemesterFilter } from './academicSemester.interface';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  errorFormat: 'minimal',
+});
 
 // create academic semester
 const createAcademicSemester = async (
@@ -70,19 +72,17 @@ const getAllSemesters = async (
       //   },
       // ],
       whereConditions,
-
     skip,
     take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? {
+            [options.sortBy]: options.sortOrder,
+          }
+        : {
+            createdAt: 'desc',
+          },
   });
-
-  // .findMany()
-  // // .sort({
-  // //   createdAt: 'desc',
-  // //   year: 'desc',
-  // //   code: 'desc',
-  // // })
-  // .skip(skip)
-  // .limit(limit);
 
   const total = await prisma.academicSemester.count();
   return {
@@ -95,7 +95,20 @@ const getAllSemesters = async (
   };
 };
 
+// get a single semester
+const getAsingleSemester = async (
+  id: string
+): Promise<AcademicSemester | null> => {
+  const result = await prisma.academicSemester.findUnique({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
+
 export const academicSemesterService = {
   createAcademicSemester,
   getAllSemesters,
+  getAsingleSemester,
 };

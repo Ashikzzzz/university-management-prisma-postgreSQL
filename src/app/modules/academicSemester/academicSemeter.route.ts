@@ -5,6 +5,10 @@ import { academicSemesterZodValidation } from './academicSemester.validation';
 
 const router = express.Router();
 
+// get a single semester
+router.get('/:id', academicSemesterController.getAsingleSemester);
+
+// get all semester
 router.get('/', academicSemesterController.getAllSemesters);
 
 router.post(
