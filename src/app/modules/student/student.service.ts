@@ -109,8 +109,25 @@ const getAsingleStudent = async (id: string): Promise<Student | null> => {
   return result;
 };
 
+// update a student data
+const updateAStudent = async (
+  id: string,
+  payload: Student
+): Promise<Student> => {
+  const result = await prisma.student.update({
+    where: { id },
+    data: {
+      firstName: payload.firstName,
+      contactNo: payload.contactNo,
+      bloodGroup: payload.bloodGroup,
+    },
+  });
+  return result;
+};
+
 export const studentService = {
   createStudent,
   getAllStudents,
   getAsingleStudent,
+  updateAStudent,
 };

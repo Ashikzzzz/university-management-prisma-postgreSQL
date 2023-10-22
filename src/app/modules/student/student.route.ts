@@ -18,4 +18,7 @@ router.post(
   studentController.createStudent
 );
 
+// update a student
+router.patch('/:id', studentController.updateAStudent);
+
 export const studentRoute = router;
