@@ -120,9 +120,19 @@ const updateAcademicFaculty = async (
   return result;
 };
 
+const deleteFaculty = async (id: string): Promise<AcademicFaculty> => {
+  const result = await prisma.academicFaculty.delete({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
+
 export const academicFacultyService = {
   createAcademicFaculty,
   getAllFaculty,
   getAsingleFaculty,
   updateAcademicFaculty,
+  deleteFaculty,
 };

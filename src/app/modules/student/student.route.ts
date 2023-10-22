@@ -21,4 +21,7 @@ router.post(
 // update a student
 router.patch('/:id', studentController.updateAStudent);
 
+// delete a student
+router.delete('/:id', studentController.deleteStudent);
+
 export const studentRoute = router;

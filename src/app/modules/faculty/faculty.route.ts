@@ -21,4 +21,7 @@ router.post(
 // update a faculty
 router.patch('/:id', facultyController.updateAFaculty);
 
+// delete a faculty
+router.delete('/:id', facultyController.deleteFaculty);
+
 export const facultyRoute = router;

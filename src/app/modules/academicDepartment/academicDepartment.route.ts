@@ -21,4 +21,7 @@ router.post(
 // update department
 router.patch('/:id', academicDepartmentController.updateAcademicDepartment);
 
+// delete a department
+router.delete('/:id', academicDepartmentController.deleteDepartment);
+
 export const academicDepartmentRoute = router;

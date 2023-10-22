@@ -20,4 +20,7 @@ router.post(
 // update semester
 router.patch('/:id', academicSemesterController.updateSemester);
 
+// delete a semester
+router.delete('/:id', academicSemesterController.deleteSemester);
+
 export const academicSemesterRoute = router;
