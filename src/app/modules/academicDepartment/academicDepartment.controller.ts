@@ -1,3 +1,4 @@
+import { AcademicDepartment } from '@prisma/client';
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import catchAsync from '../../../shared/catchAsync';
@@ -38,7 +39,20 @@ const getAllDepartments = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get a single academic department
+const getAsingleDepartment = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const result = await academicDepartmentService.getAsingleDepartment(id);
+  sendResponse<AcademicDepartment>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: ' Successful',
+    data: result,
+  });
+});
+
 export const academicDepartmentController = {
   createAcademicDepartment,
   getAllDepartments,
+  getAsingleDepartment,
 };

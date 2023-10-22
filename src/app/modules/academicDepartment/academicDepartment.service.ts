@@ -99,7 +99,20 @@ const getAllDepartments = async (
   };
 };
 
+// get a single department
+const getAsingleDepartment = async (
+  id: string
+): Promise<AcademicDepartment | null> => {
+  const result = await prisma.academicDepartment.findUnique({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
+
 export const academicDepartmentService = {
   createAcademicDepartment,
   getAllDepartments,
+  getAsingleDepartment,
 };
