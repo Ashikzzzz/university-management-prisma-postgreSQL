@@ -11,6 +11,14 @@ router.post(
   buildingController.createBuilding
 );
 
+// get a single building
+router.get('/:id', buildingController.getAsingleBuilding);
+
+router.delete('/:id', buildingController.deleteBuilding);
+
+// update a building
+router.patch('/:id', buildingController.updateABuilding);
+
 // get all building
 router.get('/', buildingController.getAllBuilding);
 

@@ -1,5 +1,6 @@
 import { Building, Prisma, PrismaClient } from '@prisma/client';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
+import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import { buildingFilter } from './building.interface';
 
@@ -19,8 +20,8 @@ const createBuilding = async (data: Building): Promise<Building> => {
 const getAllBuilding = async (
   filters: buildingFilter,
   options: IPaginationOptions
-) => {
-  const { searchTerm, ...filtersData } = filters;
+): Promise<IGenericResponse<Building[]>> => {
+  const { searchTerm } = filters;
 
   const { page, limit, skip } = paginationHelpers.calculatePagination(options);
 
@@ -39,15 +40,6 @@ const getAllBuilding = async (
   }
 
   // for filter we are getting an object
-  if (Object.keys(filtersData).length > 0) {
-    andConditions.push({
-      AND: Object.keys(filtersData).map(key => ({
-        [key]: {
-          equals: (filtersData as any)[key],
-        },
-      })),
-    });
-  }
 
   const whereConditions: Prisma.BuildingWhereInput =
     andConditions.length > 0 ? { AND: andConditions } : {};
@@ -76,7 +68,42 @@ const getAllBuilding = async (
   };
 };
 
+// update a building
+const updateABuilding = async (
+  id: string,
+  payload: Building
+): Promise<Building> => {
+  const result = await prisma.building.update({
+    where: { id },
+    data: payload,
+  });
+  return result;
+};
+
+// get a single building
+const getAsingleBuilding = async (id: string): Promise<Building | null> => {
+  const result = await prisma.building.findUnique({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
+
+// delete a building
+const deleteBuilding = async (id: string): Promise<Building> => {
+  const result = await prisma.building.delete({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
+
 export const buildingService = {
   createBuilding,
   getAllBuilding,
+  updateABuilding,
+  getAsingleBuilding,
+  deleteBuilding,
 };
