@@ -120,3 +120,26 @@ model Building {
            buildingId String     
            @@map("rooms")
        }
+
+
+model Course {
+   id String @id @default(uuid())
+   title String
+   code String
+   credits Int
+   createdAt DateTime @default(now())     
+   updatedAt DateTime @updatedAt
+   preRequisite CourseToPreRequisite[] @relation("courseToPrerequisite")
+   preRequisiteFor CourseToPreRequisite[] @relation("PrerequisiteToCourse")
+   @@map("course")      
+}
+
+model CourseToPreRequisite {
+  courseId String
+  course Course @relation(fields: [courseId],references: [id], name: "courseToPrerequisite")
+
+  preRequisiteId String
+  preRequisite Course @relation(fields: [preRequisiteId],references: [id], name: "PrerequisiteToCourse")
+
+  @@id([courseId,preRequisiteId])
+}

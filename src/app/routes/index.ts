@@ -3,6 +3,7 @@ import { academicDepartmentRoute } from '../modules/academicDepartment/academicD
 import { academicFacultyRoute } from '../modules/academicFaculty/academicFaculty.route';
 import { academicSemesterRoute } from '../modules/academicSemester/academicSemeter.route';
 import { buildingRoute } from '../modules/building/building.route';
+import { courseRoute } from '../modules/course/course.route';
 import { facultyRoute } from '../modules/faculty/faculty.route';
 import { roomRoute } from '../modules/room/room.route';
 import { studentRoute } from '../modules/student/student.route';
@@ -38,6 +39,10 @@ const moduleRoutes = [
   {
     path: '/rooms',
     route: roomRoute,
+  },
+  {
+    path: '/courses',
+    route: courseRoute,
   },
 ];
 
