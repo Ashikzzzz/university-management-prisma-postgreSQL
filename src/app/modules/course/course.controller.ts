@@ -1,3 +1,4 @@
+import { Course } from '@prisma/client';
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import catchAsync from '../../../shared/catchAsync';
@@ -31,7 +32,20 @@ const getAllCourses = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get a single course
+const getSingleCourse = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const result = await courseService.getSingleCourse(id);
+  sendResponse<Course>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: ' Successful',
+    data: result,
+  });
+});
+
 export const courseController = {
   createCourse,
   getAllCourses,
+  getSingleCourse,
 };
