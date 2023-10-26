@@ -125,6 +125,7 @@ const getAllCourses = async (
   };
 };
 
+// get a single course
 const getSingleCourse = async (id: string): Promise<Course | null> => {
   const result = await prisma.course.findUnique({
     where: {
@@ -146,8 +147,45 @@ const getSingleCourse = async (id: string): Promise<Course | null> => {
   return result;
 };
 
+// delete a course
+const deleteCourse = async (id: string): Promise<Course> => {
+  await prisma.courseToPreRequisite.deleteMany({
+    where: {
+      OR: [
+        {
+          courseId: id,
+        },
+        {
+          preRequisiteId: id,
+        },
+      ],
+    },
+  });
+  const result = await prisma.course.delete({
+    where: {
+      id,
+    },
+  });
+
+  return result;
+};
+
+// update course
+const updateCourse = async (
+  id: string,
+  payload: ICourseCreateData
+): Promise<Course | null> => {
+  const result = await prisma.course.update({
+    where: { id },
+    data: payload,
+  });
+  return result;
+};
+
 export const courseService = {
   createCourse,
   getSingleCourse,
   getAllCourses,
+  deleteCourse,
+  updateCourse,
 };
