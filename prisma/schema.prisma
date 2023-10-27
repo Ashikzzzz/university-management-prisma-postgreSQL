@@ -20,7 +20,7 @@ model AcademicSemester {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   students Student[]
-
+  semesterRegistration SemesterRegistration[]
 
   @@map("academic_semesters")
 }
@@ -155,4 +155,25 @@ model CourseFaculty {
 
   @@id([courseId,facultyId])
   @@map("course_faculties")
+}
+
+model SemesterRegistration {
+ id String @id @default(uuid())
+ startDate DateTime
+ endDate DateTime
+ status SemesterStatus
+ minCredit Int @default(0)
+ maxCredit Int @default(0)
+ createdAt DateTime @default(now())     
+ updatedAt DateTime @updatedAt
+ academicSemesterId String
+ academicSemester AcademicSemester @relation(fields: [academicSemesterId],references: [id])
+
+ @@map("senester_registration")
+}
+
+enum SemesterStatus{
+  UPCOMING
+  ONGOING
+  ENDED
 }
