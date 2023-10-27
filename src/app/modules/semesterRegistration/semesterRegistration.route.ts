@@ -6,6 +6,9 @@ const router = express.Router();
 // get single registered semester
 router.get('/:id', semesterRegistrationController.getAsingleRegisterdSemester);
 
+// delete registerd semester
+router.delete('/:id', semesterRegistrationController.deleteRegisterdSemester);
+
 // get all registerd semester
 router.get('/', semesterRegistrationController.getAllRegisteredSemeter);
 

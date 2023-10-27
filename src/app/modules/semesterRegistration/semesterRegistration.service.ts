@@ -115,6 +115,24 @@ const getAsingleRegisterdSemester = async (
     where: {
       id,
     },
+    include: {
+      academicSemester: true,
+    },
+  });
+  return result;
+};
+
+// delete registerd semester
+const deleteRegisterdSemester = async (
+  id: string
+): Promise<SemesterRegistration | null> => {
+  const result = await prisma.semesterRegistration.delete({
+    where: {
+      id,
+    },
+    include: {
+      academicSemester: true,
+    },
   });
   return result;
 };
@@ -123,4 +141,5 @@ export const semesterRegistrationService = {
   createSemesterRegistration,
   getAllRegisteredSemeter,
   getAsingleRegisterdSemester,
+  deleteRegisterdSemester,
 };
