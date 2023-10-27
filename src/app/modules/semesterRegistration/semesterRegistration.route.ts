@@ -1,5 +1,7 @@
 import express from 'express';
+import validateRequest from '../../middlewares/validateRequest';
 import { semesterRegistrationController } from './semesterRegistration.controller';
+import { registerdSemesterValidation } from './semesterRegistration.validation';
 
 const router = express.Router();
 
@@ -18,6 +20,7 @@ router.get('/', semesterRegistrationController.getAllRegisteredSemeter);
 // create semesterRegistration
 router.post(
   '/create-registration',
+  validateRequest(registerdSemesterValidation.registerdSemesterZodSchema),
   semesterRegistrationController.createSemesterRegistration
 );
 
