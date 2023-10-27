@@ -9,6 +9,9 @@ router.get('/:id', semesterRegistrationController.getAsingleRegisterdSemester);
 // delete registerd semester
 router.delete('/:id', semesterRegistrationController.deleteRegisterdSemester);
 
+// update registered semester
+router.patch('/:id', semesterRegistrationController.updateRegisterdSemester);
+
 // get all registerd semester
 router.get('/', semesterRegistrationController.getAllRegisteredSemeter);
 
