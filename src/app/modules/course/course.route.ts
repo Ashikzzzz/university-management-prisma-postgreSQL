@@ -12,10 +12,18 @@ router.delete(
 );
 
 // assign a faculty
-router.post('/:id/assign-faculty', courseController.assignFacultyToCourse);
+router.post(
+  '/:id/assign-faculty',
+  validateRequest(courseZodValidation.assignOrRemoveFaculties),
+  courseController.assignFacultyToCourse
+);
 
 // delete a course
-router.delete('/delete-course/:id', courseController.deleteCourse);
+router.delete(
+  '/delete-course/:id',
+  validateRequest(courseZodValidation.assignOrRemoveFaculties),
+  courseController.deleteCourse
+);
 
 // get single course
 router.get('/:id', courseController.getSingleCourse);

@@ -6,10 +6,18 @@ import { facultyZodValidation } from './faculty.validation';
 const router = express.Router();
 
 // assign a course
-router.post('/:id/assign-courses', facultyController.assignCourseToFaculty);
+router.post(
+  '/:id/assign-courses',
+  validateRequest(facultyZodValidation.assignOrRemoveCourses),
+  facultyController.assignCourseToFaculty
+);
 
 // delete course from faculty
-router.delete('/:id/remove-course', facultyController.deleteCourseFromFaculty);
+router.delete(
+  '/:id/remove-course',
+  validateRequest(facultyZodValidation.assignOrRemoveCourses),
+  facultyController.deleteCourseFromFaculty
+);
 
 // get a single faculty
 router.get('/:id', facultyController.getAsingleFaculty);
