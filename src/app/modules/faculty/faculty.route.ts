@@ -5,6 +5,12 @@ import { facultyZodValidation } from './faculty.validation';
 
 const router = express.Router();
 
+// assign a course
+router.post('/:id/assign-courses', facultyController.assignCourseToFaculty);
+
+// delete course from faculty
+router.delete('/:id/remove-course', facultyController.deleteCourseFromFaculty);
+
 // get a single faculty
 router.get('/:id', facultyController.getAsingleFaculty);
 
