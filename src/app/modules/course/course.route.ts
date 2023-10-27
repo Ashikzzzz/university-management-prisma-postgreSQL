@@ -4,6 +4,16 @@ import { courseController } from './course.controller';
 import { courseZodValidation } from './course.validation';
 
 const router = express.Router();
+
+// delete faculties from course
+router.delete(
+  '/:id/remove-faculties',
+  courseController.deleteFacultiesFromCourse
+);
+
+// assign a faculty
+router.post('/:id/assign-faculty', courseController.assignFacultyToCourse);
+
 // delete a course
 router.delete('/delete-course/:id', courseController.deleteCourse);
 
