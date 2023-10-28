@@ -8,19 +8,36 @@ const prisma = new PrismaClient({
 // create a offered course
 const createOfferedCourse = async (data: IOfferedCourseData) => {
   const { academicDepartmentId, semesterRegistrationId, courseIds } = data;
+
   const finalResult = [];
   let courseId = [] as unknown as string;
+
   if (courseIds && courseIds.length > 0) {
     for (let i = 0; i < courseIds.length; i++) {
       courseId = courseIds[i];
-      const result = await prisma.offeredCourse.create({
-        data: {
+      const isExist = await prisma.offeredCourse.findFirst({
+        where: {
           academicDepartmentId,
           semesterRegistrationId,
           courseId,
         },
       });
-      finalResult.push(result);
+
+      if (!isExist) {
+        const result = await prisma.offeredCourse.create({
+          data: {
+            academicDepartmentId,
+            semesterRegistrationId,
+            courseId,
+          },
+          include: {
+            academicDepartment: true,
+            semesterRegistration: true,
+            course: true,
+          },
+        });
+        finalResult.push(result);
+      }
     }
   }
 
