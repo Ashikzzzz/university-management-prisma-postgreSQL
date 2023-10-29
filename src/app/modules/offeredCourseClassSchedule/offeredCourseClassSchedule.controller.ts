@@ -45,7 +45,51 @@ const getAllOfferdCourseSchedule = catchAsync(
   }
 );
 
+// find single
+const getASingleClassSchedule = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await courseClassScheduleService.getASingleClassSchedule(id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: ' fetched successfully',
+      data: result,
+    });
+  }
+);
+
+// update
+const updateClassSchedule = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await courseClassScheduleService.updateClassSchedule(
+    id,
+    req.body
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: ' updated successfully',
+    data: result,
+  });
+});
+
+// delete
+const deleteClassSchedule = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await courseClassScheduleService.deleteClassSchedule(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: ' deleted successfully',
+    data: result,
+  });
+});
+
 export const courseClassScheduleController = {
   createCourseClassSchedule,
   getAllOfferdCourseSchedule,
+  getASingleClassSchedule,
+  updateClassSchedule,
+  deleteClassSchedule,
 };
