@@ -28,6 +28,9 @@ const createCourseClassSchedule = async (
       room: {
         id: data.roomId,
       },
+      faculty: {
+        id: data.facultyId,
+      },
     },
   });
 
@@ -35,12 +38,14 @@ const createCourseClassSchedule = async (
     startTime: schedule.startTime,
     endTime: schedule.endTime,
     dayOfWeek: schedule.dayOfWeek,
+    faculty: schedule.facultyId,
   }));
 
   const newSlot = {
     startTime: data.startTime,
     endTime: data.endTime,
     dayOfWeek: data.dayOfWeek,
+    faculty: data.facultyId,
   };
 
   for (const slot of existingSlots) {
@@ -49,8 +54,12 @@ const createCourseClassSchedule = async (
     const newStart = new Date(`1970-01-01T${newSlot.startTime}:00`);
     const newEnd = new Date(`1970-01-01T${newSlot.endTime}:00`);
 
+    if (newSlot.faculty === slot.faculty) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Faculty is booked');
+    }
+
     if (newStart < existingEnd && newEnd > existingStart) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid time');
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Room is booked');
     }
   }
 
