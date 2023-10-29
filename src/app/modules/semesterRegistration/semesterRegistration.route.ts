@@ -1,9 +1,18 @@
 import express from 'express';
+import { ENUM_USER_ROLE } from '../../../enums/user';
+import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import { semesterRegistrationController } from './semesterRegistration.controller';
 import { registerdSemesterValidation } from './semesterRegistration.validation';
 
 const router = express.Router();
+
+// student semester reg
+router.post(
+  '/start-registration',
+  auth(ENUM_USER_ROLE.STUDENT),
+  semesterRegistrationController.startMyRegistration
+);
 
 // get single registered semester
 router.get('/:id', semesterRegistrationController.getAsingleRegisterdSemester);

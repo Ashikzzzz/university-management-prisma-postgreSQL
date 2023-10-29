@@ -3,6 +3,7 @@ import {
   PrismaClient,
   SemesterRegistration,
   SemesterStatus,
+  StudentSemesterRegistration,
 } from '@prisma/client';
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
@@ -32,11 +33,8 @@ const createSemesterRegistration = async (
     },
   });
 
-  if (isSemesterRunning) {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      `Semester is ${isSemesterRunning.status}`
-    );
+  if (!isSemesterRunning) {
+    throw new ApiError(httpStatus.BAD_REQUEST, `Semester is not created`);
   }
 
   const result = await prisma.semesterRegistration.create({
@@ -182,10 +180,79 @@ const updateRegisterdSemester = async (
   return result;
 };
 
+// student semester reg
+const startMyRegistration = async (
+  authUserId: string
+): Promise<{
+  semesterRegistration: SemesterRegistration | null;
+  studentSemesterRegistration: StudentSemesterRegistration | null;
+}> => {
+  const studentInfo = await prisma.student.findFirst({
+    where: {
+      student_id: authUserId,
+    },
+  });
+  // console.log(studentInfo);
+  if (!studentInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'student is not found');
+  }
+  const semesterRegInfo = await prisma.semesterRegistration.findFirst({
+    where: {
+      status: {
+        in: [SemesterStatus.ONGOING, SemesterStatus.UPCOMING],
+      },
+    },
+  });
+  // console.log(semesterRegInfo);
+  if (semesterRegInfo?.status === SemesterStatus.UPCOMING) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Semester isnot started yet');
+  }
+
+  let studentReg = await prisma.studentSemesterRegistration.findFirst({
+    where: {
+      student: {
+        id: studentInfo?.id,
+      },
+      semesterRegistration: {
+        id: semesterRegInfo?.id,
+      },
+    },
+  });
+
+  if (studentReg) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Semester is already registered'
+    );
+  }
+
+  if (!studentReg) {
+    studentReg = await prisma.studentSemesterRegistration.create({
+      data: {
+        student: {
+          connect: {
+            id: studentInfo?.id,
+          },
+        },
+        semesterRegistration: {
+          connect: {
+            id: semesterRegInfo?.id,
+          },
+        },
+      },
+    });
+  }
+  return {
+    semesterRegistration: semesterRegInfo,
+    studentSemesterRegistration: studentReg,
+  };
+};
+
 export const semesterRegistrationService = {
   createSemesterRegistration,
   getAllRegisteredSemeter,
   getAsingleRegisterdSemester,
   deleteRegisterdSemester,
   updateRegisterdSemester,
+  startMyRegistration,
 };
