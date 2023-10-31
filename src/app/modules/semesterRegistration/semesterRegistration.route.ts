@@ -7,11 +7,24 @@ import { registerdSemesterValidation } from './semesterRegistration.validation';
 
 const router = express.Router();
 
+router.post(
+  '/withdraw-course',
+  auth(ENUM_USER_ROLE.STUDENT),
+  semesterRegistrationController.withdrawCourse
+);
+
 // student semester reg
 router.post(
   '/start-registration',
   auth(ENUM_USER_ROLE.STUDENT),
   semesterRegistrationController.startMyRegistration
+);
+
+// enroll course
+router.post(
+  '/enroll-course',
+  auth(ENUM_USER_ROLE.STUDENT),
+  semesterRegistrationController.enrollCourse
 );
 
 // get single registered semester

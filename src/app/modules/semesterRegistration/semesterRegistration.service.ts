@@ -248,6 +248,183 @@ const startMyRegistration = async (
   };
 };
 
+// enrollCourse
+const enrollCourse = async (
+  userId: string,
+  payload: {
+    offeredCourseId: string;
+    offeredCourseSectionId: string;
+  }
+) => {
+  const studentInfo = await prisma.student.findFirst({
+    where: {
+      student_id: userId,
+    },
+  });
+  if (!studentInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Student doesn't found");
+  }
+
+  const semesterRegInfo = await prisma.semesterRegistration.findFirst({
+    where: {
+      status: SemesterStatus.ONGOING,
+    },
+  });
+  if (!semesterRegInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "semesterRegInfo doesn't found");
+  }
+
+  const offeredCourse = await prisma.offeredCourse.findFirst({
+    where: {
+      id: payload.offeredCourseId,
+    },
+  });
+
+  if (!offeredCourse) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Offered Course doesn't found");
+  }
+
+  const offeredCourseSection = await prisma.offeredCourseSection.findFirst({
+    where: {
+      id: payload.offeredCourseSectionId,
+    },
+  });
+
+  if (!offeredCourseSection) {
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      "offered Course Section doesn't found"
+    );
+  }
+
+  if (
+    offeredCourseSection.maxCapacity &&
+    offeredCourseSection.currentlyEnrolledStudent &&
+    offeredCourseSection.currentlyEnrolledStudent >=
+      offeredCourseSection.maxCapacity
+  ) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'This section is full');
+  }
+  await prisma.$transaction(async transactionClient => {
+    await transactionClient.studentRegistrationCourse.create({
+      data: {
+        studentId: studentInfo?.id,
+        semesterRegistrationId: semesterRegInfo?.id,
+        offeredCourseId: payload.offeredCourseId,
+        offeredCourseSectionId: payload.offeredCourseSectionId,
+      },
+    });
+    await transactionClient.offeredCourseSection.update({
+      where: {
+        id: payload.offeredCourseSectionId,
+      },
+      data: {
+        currentlyEnrolledStudent: {
+          increment: 1,
+        },
+      },
+    });
+    // await transactionClient.studentSemesterRegistration.update({
+    //   where: {
+    //     student: {
+    //       id: studentInfo.id,
+    //     },
+    //     semesterRegistration: {
+    //       id: semesterRegInfo.id,
+    //     },
+    //   },
+    //   data: {
+    //     totalCreditTaken: {
+    //       increment: offeredCourse
+    //     },
+    //   },
+    // });
+  });
+
+  return {
+    message: 'Successfully enrolled to this course',
+  };
+};
+
+// withdraw course
+const withdrawCourse = async (
+  userId: string,
+  payload: {
+    offeredCourseId: string;
+    offeredCourseSectionId: string;
+  }
+) => {
+  const studentInfo = await prisma.student.findFirst({
+    where: {
+      student_id: userId,
+    },
+  });
+  if (!studentInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Student doesn't found");
+  }
+
+  const semesterRegInfo = await prisma.semesterRegistration.findFirst({
+    where: {
+      status: SemesterStatus.ONGOING,
+    },
+  });
+  if (!semesterRegInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "semesterRegInfo doesn't found");
+  }
+
+  const offeredCourse = await prisma.offeredCourse.findFirst({
+    where: {
+      id: payload.offeredCourseId,
+    },
+  });
+
+  if (!offeredCourse) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Offered Course doesn't found");
+  }
+
+  await prisma.$transaction(async transactionClient => {
+    await transactionClient.studentRegistrationCourse.delete({
+      where: {
+        semesterRegistrationId_studentId_offeredCourseId: {
+          semesterRegistrationId: semesterRegInfo?.id,
+          studentId: studentInfo?.id,
+          offeredCourseId: payload.offeredCourseId,
+        },
+      },
+    });
+
+    await transactionClient.offeredCourseSection.update({
+      where: {
+        id: payload.offeredCourseSectionId,
+      },
+      data: {
+        currentlyEnrolledStudent: {
+          decrement: 1,
+        },
+      },
+    });
+    // await transactionClient.studentSemesterRegistration.update({
+    //   where: {
+    //     student: {
+    //       id: studentInfo.id,
+    //     },
+    //     semesterRegistration: {
+    //       id: semesterRegInfo.id,
+    //     },
+    //   },
+    //   data: {
+    //     totalCreditTaken: {
+    //       decrement: offeredCourse
+    //     },
+    //   },
+    // });
+  });
+
+  return {
+    message: 'Successfully Withdraw to this course',
+  };
+};
+
 export const semesterRegistrationService = {
   createSemesterRegistration,
   getAllRegisteredSemeter,
@@ -255,4 +432,6 @@ export const semesterRegistrationService = {
   deleteRegisterdSemester,
   updateRegisterdSemester,
   startMyRegistration,
+  enrollCourse,
+  withdrawCourse,
 };

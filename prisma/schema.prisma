@@ -77,6 +77,7 @@ model Student {
    academicFacultyId String
 
    studentSemesterRegistration StudentSemesterRegistration[]
+   studentRegistrationCourse StudentRegistrationCourse[]
    @@map("students")
 }
 
@@ -177,7 +178,7 @@ model SemesterRegistration {
  offeredCourseSection OfferedCourseSection[]
  offeredCourseClassSchedule OfferedCourseClassSchedule[]
  studentSemesterRegistration StudentSemesterRegistration[]
-
+ studentRegistrationCourse StudentRegistrationCourse[]
  @@map("senester_registration")
 }
 
@@ -202,6 +203,7 @@ model OfferedCourse{
  semesterRegistration SemesterRegistration @relation(fields: [semesterRegistrationId],references: [id])
 
  offeredCourseSection OfferedCourseSection[]
+ studentRegistrationCourse StudentRegistrationCourse[]
 
  @@map("offered_course")
 }
@@ -222,7 +224,7 @@ model OfferedCourseSection{
    semesterRegistration SemesterRegistration @relation(fields: [semesterRegistrationId],references: [id])
 
    offeredCourseClassSchedule OfferedCourseClassSchedule[]
-
+   studentRegistrationCourse StudentRegistrationCourse[]
    @@map("offered_course_section")
 }
 
@@ -273,5 +275,24 @@ model StudentSemesterRegistration {
   semesterRegistration SemesterRegistration @relation(fields: [semesterRegistrationId],references: [id])
 
   @@map("student_semester_registration")
+
+}
+
+model StudentRegistrationCourse {
+  semesterRegistrationId String
+  semesterRegistration SemesterRegistration @relation(fields: [semesterRegistrationId],references: [id])
+
+  studentId String
+  student Student @relation(fields: [studentId],references: [id])
+
+  offeredCourseId String
+  offeredCourse OfferedCourse @relation(fields: [offeredCourseId],references: [id])
+   
+  offeredCourseSectionId String
+  offeredCourseSection OfferedCourseSection @relation(fields: [offeredCourseSectionId],references: [id])
+  
+  @@id([semesterRegistrationId,studentId,offeredCourseId])
+
+  @@map("student_registration_course")
 
 }
