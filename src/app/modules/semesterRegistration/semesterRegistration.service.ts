@@ -492,6 +492,9 @@ const getMyRegistration = async (userId: string) => {
     where: {
       status: SemesterStatus.ONGOING,
     },
+    include: {
+      academicSemester: true,
+    },
   });
 
   const studentSemesterReg = await prisma.studentSemesterRegistration.findFirst(
@@ -504,6 +507,9 @@ const getMyRegistration = async (userId: string) => {
           student_id: userId,
         },
       },
+      include: {
+        student: true,
+      },
     }
   );
 
@@ -511,6 +517,44 @@ const getMyRegistration = async (userId: string) => {
     studentSemesterReg,
     semesterRegInfo,
   };
+};
+
+// start new semester
+const startSemester = async (id: string) => {
+  const semesterRegInfo = await prisma.semesterRegistration.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      academicSemester: true,
+    },
+  });
+  // console.log('semesterRegInfo', semesterRegInfo);
+  if (!semesterRegInfo) {
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      'Semester registration is not found'
+    );
+  }
+
+  if (semesterRegInfo.status !== SemesterStatus.ENDED) {
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      'Semester registration is not ended yet'
+    );
+  }
+
+  const updateAcademicSemester = await prisma.academicSemester.update({
+    where: {
+      id: semesterRegInfo.academicSemester.id,
+    },
+    data: {
+      isCurrent: true,
+    },
+  });
+  // console.log(updateAcademicSemester);
+
+  return updateAcademicSemester;
 };
 
 export const semesterRegistrationService = {
@@ -524,4 +568,5 @@ export const semesterRegistrationService = {
   withdrawCourse,
   confirmRegistration,
   getMyRegistration,
+  startSemester,
 };

@@ -7,6 +7,12 @@ import { registerdSemesterValidation } from './semesterRegistration.validation';
 
 const router = express.Router();
 
+// start new semester
+router.post(
+  '/:id/start-semester',
+  semesterRegistrationController.startSemester
+);
+
 // get my registration
 router.get(
   '/my-registration',
