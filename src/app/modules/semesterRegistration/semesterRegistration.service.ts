@@ -278,7 +278,11 @@ const enrollCourse = async (
     where: {
       id: payload.offeredCourseId,
     },
+    include: {
+      course: true,
+    },
   });
+  console.log(offeredCourse);
 
   if (!offeredCourse) {
     throw new ApiError(httpStatus.NOT_FOUND, "Offered Course doesn't found");
@@ -324,21 +328,17 @@ const enrollCourse = async (
         },
       },
     });
-    // await transactionClient.studentSemesterRegistration.update({
-    //   where: {
-    //     student: {
-    //       id: studentInfo.id,
-    //     },
-    //     semesterRegistration: {
-    //       id: semesterRegInfo.id,
-    //     },
-    //   },
-    //   data: {
-    //     totalCreditTaken: {
-    //       increment: offeredCourse
-    //     },
-    //   },
-    // });
+
+    await transactionClient.studentSemesterRegistration.updateMany({
+      where: {
+        studentId: studentInfo.id,
+      },
+      data: {
+        totalCreditTaken: {
+          increment: offeredCourse.course.credits,
+        },
+      },
+    });
   });
 
   return {
@@ -376,6 +376,9 @@ const withdrawCourse = async (
     where: {
       id: payload.offeredCourseId,
     },
+    include: {
+      course: true,
+    },
   });
 
   if (!offeredCourse) {
@@ -403,21 +406,21 @@ const withdrawCourse = async (
         },
       },
     });
-    // await transactionClient.studentSemesterRegistration.update({
-    //   where: {
-    //     student: {
-    //       id: studentInfo.id,
-    //     },
-    //     semesterRegistration: {
-    //       id: semesterRegInfo.id,
-    //     },
-    //   },
-    //   data: {
-    //     totalCreditTaken: {
-    //       decrement: offeredCourse
-    //     },
-    //   },
-    // });
+    await transactionClient.studentSemesterRegistration.updateMany({
+      where: {
+        student: {
+          id: studentInfo.id,
+        },
+        semesterRegistration: {
+          id: semesterRegInfo.id,
+        },
+      },
+      data: {
+        totalCreditTaken: {
+          decrement: offeredCourse.course.credits,
+        },
+      },
+    });
   });
 
   return {
@@ -483,6 +486,33 @@ const confirmRegistration = async (
   };
 };
 
+// get my registration
+const getMyRegistration = async (userId: string) => {
+  const semesterRegInfo = await prisma.semesterRegistration.findFirst({
+    where: {
+      status: SemesterStatus.ONGOING,
+    },
+  });
+
+  const studentSemesterReg = await prisma.studentSemesterRegistration.findFirst(
+    {
+      where: {
+        semesterRegistration: {
+          id: semesterRegInfo?.id,
+        },
+        student: {
+          student_id: userId,
+        },
+      },
+    }
+  );
+
+  return {
+    studentSemesterReg,
+    semesterRegInfo,
+  };
+};
+
 export const semesterRegistrationService = {
   createSemesterRegistration,
   getAllRegisteredSemeter,
@@ -493,4 +523,5 @@ export const semesterRegistrationService = {
   enrollCourse,
   withdrawCourse,
   confirmRegistration,
+  getMyRegistration,
 };
