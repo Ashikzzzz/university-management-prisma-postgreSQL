@@ -7,9 +7,17 @@ import { registerdSemesterValidation } from './semesterRegistration.validation';
 
 const router = express.Router();
 
+// confirm registration
+router.post(
+  '/confirm-registration',
+  auth(ENUM_USER_ROLE.STUDENT),
+  semesterRegistrationController.confirmRegistration
+);
+
 router.post(
   '/withdraw-course',
   auth(ENUM_USER_ROLE.STUDENT),
+
   semesterRegistrationController.withdrawCourse
 );
 
@@ -24,6 +32,7 @@ router.post(
 router.post(
   '/enroll-course',
   auth(ENUM_USER_ROLE.STUDENT),
+
   semesterRegistrationController.enrollCourse
 );
 

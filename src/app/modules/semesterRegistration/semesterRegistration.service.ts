@@ -425,6 +425,64 @@ const withdrawCourse = async (
   };
 };
 
+// confirm registration
+const confirmRegistration = async (
+  userId: string
+): Promise<{ message: string }> => {
+  const semesterRegInfo = await prisma.semesterRegistration.findFirst({
+    where: {
+      status: SemesterStatus.ONGOING,
+    },
+  });
+  if (!semesterRegInfo) {
+    throw new ApiError(httpStatus.NOT_FOUND, "semesterRegInfo doesn't found");
+  }
+  console.log(semesterRegInfo);
+  const studentSemesterRegistration =
+    await prisma.studentSemesterRegistration.findFirst({
+      where: {
+        semesterRegistration: {
+          id: semesterRegInfo.id,
+        },
+        student: {
+          student_id: userId,
+        },
+      },
+    });
+  if (!studentSemesterRegistration) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'you are not recognized');
+  }
+
+  if (studentSemesterRegistration.totalCreditTaken === 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'you are not enrolled');
+  }
+
+  if (
+    studentSemesterRegistration.totalCreditTaken &&
+    semesterRegInfo.maxCredit &&
+    semesterRegInfo.minCredit &&
+    (studentSemesterRegistration.totalCreditTaken < semesterRegInfo.minCredit ||
+      studentSemesterRegistration.totalCreditTaken > semesterRegInfo.maxCredit)
+  ) {
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      `you can take only ${semesterRegInfo.minCredit} from ${semesterRegInfo.maxCredit}`
+    );
+  }
+
+  await prisma.studentSemesterRegistration.update({
+    where: {
+      id: studentSemesterRegistration.id,
+    },
+    data: {
+      isConfirmed: true,
+    },
+  });
+  return {
+    message: 'Your registration is Confirmed',
+  };
+};
+
 export const semesterRegistrationService = {
   createSemesterRegistration,
   getAllRegisteredSemeter,
@@ -434,4 +492,5 @@ export const semesterRegistrationService = {
   startMyRegistration,
   enrollCourse,
   withdrawCourse,
+  confirmRegistration,
 };
