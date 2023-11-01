@@ -1,8 +1,11 @@
 import {
+  Course,
+  OfferedCourse,
   Prisma,
   PrismaClient,
   SemesterRegistration,
   SemesterStatus,
+  StudentRegistrationCourse,
   StudentSemesterRegistration,
 } from '@prisma/client';
 import httpStatus from 'http-status';
@@ -545,7 +548,7 @@ const startSemester = async (id: string): Promise<{ message: string }> => {
     );
   }
 
-  if (semesterRegInfo.academicSemester.isCurrent === true) {
+  if (semesterRegInfo.academicSemester.isCurrent) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Semester is already started');
   }
 
@@ -568,7 +571,7 @@ const startSemester = async (id: string): Promise<{ message: string }> => {
     });
 
     const studentSemesterRegistrations =
-      await prismaTransactionClient.studentSemesterRegistration.findMany({
+      await prisma.studentSemesterRegistration.findMany({
         where: {
           semesterRegistration: {
             id,
@@ -581,7 +584,7 @@ const startSemester = async (id: string): Promise<{ message: string }> => {
       studentSemesterRegistrations,
       async (studentSemReg: StudentSemesterRegistration) => {
         const studentSemesterRegistrationCourses =
-          await prismaTransactionClient.studentRegistrationCourse.findMany({
+          await prisma.studentRegistrationCourse.findMany({
             where: {
               semesterRegistration: {
                 id,
@@ -598,6 +601,36 @@ const startSemester = async (id: string): Promise<{ message: string }> => {
               },
             },
           });
+        asyncForEach(
+          studentSemesterRegistrationCourses,
+          async (
+            item: StudentRegistrationCourse & {
+              offeredCourse: OfferedCourse & {
+                course: Course;
+              };
+            }
+          ) => {
+            const isExist = await prisma.studentEnrollerdCourse.findFirst({
+              where: {
+                studentId: item.studentId,
+                courseId: item.offeredCourse.courseId,
+                academicSemesterId: semesterRegInfo.academicSemesterId,
+              },
+            });
+
+            if (!isExist) {
+              const enrolledCourseData = {
+                studentId: item.studentId,
+                courseId: item.offeredCourse.courseId,
+                academicSemesterId: semesterRegInfo.academicSemesterId,
+              };
+
+              await prisma.studentEnrollerdCourse.create({
+                data: enrolledCourseData,
+              });
+            }
+          }
+        );
       }
     );
   });
