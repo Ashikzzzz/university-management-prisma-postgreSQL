@@ -23,7 +23,7 @@ model AcademicSemester {
   students Student[]
   semesterRegistration SemesterRegistration[]
   studentEnrollerdCourse StudentEnrollerdCourse[]
-
+  studentEnrolledCourseMark StudentEnrolledCourseMark[]
   @@map("academic_semesters")
 }
 
@@ -81,6 +81,7 @@ model Student {
    studentSemesterRegistration StudentSemesterRegistration[]
    studentRegistrationCourse StudentRegistrationCourse[]
    studentEnrollerdCourse StudentEnrollerdCourse[]
+   studentEnrolledCourseMark StudentEnrolledCourseMark[]
    @@map("students")
 }
 
@@ -319,10 +320,34 @@ model StudentEnrollerdCourse {
   point Float? @default(0)
   totalMarks Int @default(0)
   status  StudentEnrolledCourseStatus? @default(ONGOING)
+
+  studentEnrolledCourseMark StudentEnrolledCourseMark[]
 }
 
 enum StudentEnrolledCourseStatus {
   ONGOING
   COMPLETED
   WITHDRAWN
+}
+
+model StudentEnrolledCourseMark {
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())     
+  updatedAt DateTime @updatedAt
+  studentId String
+  student Student @relation(fields: [studentId],references: [id])
+  studentEnrolledCourseId String
+  studentEnrolledCourse StudentEnrollerdCourse @relation(fields: [studentEnrolledCourseId],references: [id])
+  academicSemesterId String
+  academicSemester AcademicSemester @relation(fields: [academicSemesterId],references: [id])
+
+  grade String? 
+  marks Int ?
+  examType ExamType? @default(MIDTERM)
+
+  @@map("student_enrolled_course_mark")
+}
+enum ExamType {
+  MIDTERM
+  FINAL
 }
