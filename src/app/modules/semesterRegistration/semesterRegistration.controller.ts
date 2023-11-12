@@ -174,6 +174,7 @@ const getMyRegistration = catchAsync(async (req: Request, res: Response) => {
 // start semester
 const startSemester = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
+  console.log(id);
   const result = await semesterRegistrationService.startSemester(id);
   sendResponse(res, {
     statusCode: httpStatus.OK,

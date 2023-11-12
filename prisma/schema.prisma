@@ -366,6 +366,7 @@ model StudentSemesterPayment {
   fullPaymentAmount Int? @default(0)
   partialPaymentAmount Int? @default(0)
   totalPaidAmount Int? @default(0)
+  totelDueAmount Int? @default(0)
   paymentStatus PaymentStatus? @default(PENDING)
 
   @@map("student_semester_payment")
