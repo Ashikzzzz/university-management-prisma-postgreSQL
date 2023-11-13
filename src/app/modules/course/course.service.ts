@@ -175,11 +175,79 @@ const updateCourse = async (
   id: string,
   payload: ICourseCreateData
 ): Promise<Course | null> => {
-  const result = await prisma.course.update({
-    where: { id },
-    data: payload,
+  const { preRequisiteCourse, ...courseData } = payload;
+
+  // create new course
+  await prisma.$transaction(async transactionClient => {
+    const result = await transactionClient.course.update({
+      where: { id },
+      data: courseData,
+    });
+
+    if (!result) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Course is not found');
+    }
+
+    // delete pre requisite course if have
+    if (preRequisiteCourse && preRequisiteCourse.length > 0) {
+      const deletedPrerequisite = preRequisiteCourse.filter(
+        coursePrerequisite =>
+          coursePrerequisite.courseId && coursePrerequisite.isDeleted
+      );
+
+      for (let i = 0; i < deletedPrerequisite.length; i++) {
+        await transactionClient.courseToPreRequisite.deleteMany({
+          where: {
+            AND: [
+              {
+                courseId: id,
+              },
+              {
+                preRequisiteId: deletedPrerequisite[i].courseId,
+              },
+            ],
+          },
+        });
+      }
+
+      // create new pre requisite course
+
+      const newPrerequisite = preRequisiteCourse.filter(
+        coursePrerequisite =>
+          coursePrerequisite.courseId && !coursePrerequisite.isDeleted
+      );
+
+      for (let i = 0; i < newPrerequisite.length; i++) {
+        await transactionClient.courseToPreRequisite.create({
+          data: {
+            courseId: id,
+            preRequisiteId: newPrerequisite[i].courseId,
+          },
+        });
+      }
+    }
+    return result;
   });
-  return result;
+
+  const responseData = await prisma.course.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      preRequisite: {
+        include: {
+          preRequisite: true,
+        },
+      },
+      preRequisiteFor: {
+        include: {
+          course: true,
+        },
+      },
+    },
+  });
+
+  return responseData;
 };
 
 // assing a faculty to course

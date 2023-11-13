@@ -73,6 +73,12 @@ const createStudentEnrolledMark = async (
   }
 };
 
+// update student marks
+const updateMarks = async (payload: any) => {
+  console.log('first', payload);
+};
+
 export const stuentEnrolledCourseMarkService = {
   createStudentEnrolledMark,
+  updateMarks,
 };
