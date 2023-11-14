@@ -129,7 +129,61 @@ const getAllOfferedCourse = async (
   };
 };
 
+// get single offered course
+const getSingleOfferedCourse = async (
+  id: string
+): Promise<OfferedCourse | null> => {
+  const result = await prisma.offeredCourse.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      semesterRegistration: true,
+      course: true,
+      academicDepartment: true,
+    },
+  });
+  return result;
+};
+
+// update
+const updateOfferedCourse = async (
+  id: string,
+  payload: Partial<OfferedCourse>
+): Promise<OfferedCourse> => {
+  const result = await prisma.offeredCourse.update({
+    where: {
+      id,
+    },
+    data: payload,
+    include: {
+      semesterRegistration: true,
+      course: true,
+      academicDepartment: true,
+    },
+  });
+  return result;
+};
+
+// delete offered course
+const deleteOfferedCourse = async (id: string): Promise<OfferedCourse> => {
+  const result = await prisma.offeredCourse.delete({
+    where: {
+      id,
+    },
+    include: {
+      semesterRegistration: true,
+      course: true,
+      academicDepartment: true,
+    },
+  });
+  return result;
+};
+
 export const offeredCourseService = {
   createOfferedCourse,
   getAllOfferedCourse,
+  getSingleOfferedCourse,
+  updateOfferedCourse,
+  deleteOfferedCourse,
 };
