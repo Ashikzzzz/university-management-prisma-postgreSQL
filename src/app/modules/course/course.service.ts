@@ -177,7 +177,7 @@ const updateCourse = async (
 ): Promise<Course | null> => {
   const { preRequisiteCourse, ...courseData } = payload;
 
-  // create new course
+  // update new course
   await prisma.$transaction(async transactionClient => {
     const result = await transactionClient.course.update({
       where: { id },

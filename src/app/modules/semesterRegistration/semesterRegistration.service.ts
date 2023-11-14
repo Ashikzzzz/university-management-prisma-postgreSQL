@@ -39,8 +39,11 @@ const createSemesterRegistration = async (
     },
   });
 
-  if (!isSemesterRunning) {
-    throw new ApiError(httpStatus.BAD_REQUEST, `Semester is not created`);
+  if (isSemesterRunning) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      `Semester is ${isSemesterRunning.status}`
+    );
   }
 
   const result = await prisma.semesterRegistration.create({
@@ -153,7 +156,9 @@ const updateRegisterdSemester = async (
   if (!isExist) {
     throw new ApiError(httpStatus.NOT_FOUND, "Semester can't find");
   }
+  // upcoming => ongoing => ended
 
+  // upcomig but must received ongoing
   if (
     payload.status &&
     isExist.status === SemesterStatus.UPCOMING &&
@@ -164,7 +169,7 @@ const updateRegisterdSemester = async (
       'Can only move from UPCOMING to ONGOING'
     );
   }
-
+  //ONGOING but must received ENDED
   if (
     payload.status &&
     isExist.status === SemesterStatus.ONGOING &&
