@@ -190,7 +190,7 @@ model SemesterRegistration {
  @@map("senester_registration")
 }
 
-enum SemesterStatus{
+enum SemesterStatus {
   UPCOMING
   ONGOING
   ENDED

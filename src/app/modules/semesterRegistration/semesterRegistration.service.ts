@@ -198,6 +198,7 @@ const startMyRegistration = async (
   semesterRegistration: SemesterRegistration | null;
   studentSemesterRegistration: StudentSemesterRegistration | null;
 }> => {
+  // check student data
   const studentInfo = await prisma.student.findFirst({
     where: {
       student_id: authUserId,
@@ -207,6 +208,8 @@ const startMyRegistration = async (
   if (!studentInfo) {
     throw new ApiError(httpStatus.NOT_FOUND, 'student is not found');
   }
+
+  // check semester status ongoing or upcoming
   const semesterRegInfo = await prisma.semesterRegistration.findFirst({
     where: {
       status: {
@@ -267,6 +270,7 @@ const enrollCourse = async (
     offeredCourseSectionId: string;
   }
 ) => {
+  // check student data
   const studentInfo = await prisma.student.findFirst({
     where: {
       student_id: userId,
@@ -276,6 +280,7 @@ const enrollCourse = async (
     throw new ApiError(httpStatus.NOT_FOUND, "Student doesn't found");
   }
 
+  //  check semester registration data
   const semesterRegInfo = await prisma.semesterRegistration.findFirst({
     where: {
       status: SemesterStatus.ONGOING,
@@ -284,7 +289,7 @@ const enrollCourse = async (
   if (!semesterRegInfo) {
     throw new ApiError(httpStatus.NOT_FOUND, "semesterRegInfo doesn't found");
   }
-
+  // check offerd course data
   const offeredCourse = await prisma.offeredCourse.findFirst({
     where: {
       id: payload.offeredCourseId,
@@ -298,7 +303,7 @@ const enrollCourse = async (
   if (!offeredCourse) {
     throw new ApiError(httpStatus.NOT_FOUND, "Offered Course doesn't found");
   }
-
+  //  check offered course section data
   const offeredCourseSection = await prisma.offeredCourseSection.findFirst({
     where: {
       id: payload.offeredCourseSectionId,

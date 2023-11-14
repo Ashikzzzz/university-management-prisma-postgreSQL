@@ -27,6 +27,7 @@ router.post(
   semesterRegistrationController.confirmRegistration
 );
 
+// withdraw course
 router.post(
   '/withdraw-course',
   auth(ENUM_USER_ROLE.STUDENT),

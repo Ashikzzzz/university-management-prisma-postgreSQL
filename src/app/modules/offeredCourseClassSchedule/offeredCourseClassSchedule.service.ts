@@ -54,14 +54,12 @@ const createCourseClassSchedule = async (
     const newStart = new Date(`1970-01-01T${newSlot.startTime}:00`);
     const newEnd = new Date(`1970-01-01T${newSlot.endTime}:00`);
 
+    // check time and faculty is booked or not
+
     if (newStart < existingEnd && newEnd > existingStart) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Room is booked');
-    }
-  }
-
-  for (const faculty of existingSlots) {
-    if (faculty.faculty === newSlot.faculty) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Faculty is booked');
+    } else if (slot.faculty === newSlot.faculty) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'faculty is booked');
     }
   }
 
