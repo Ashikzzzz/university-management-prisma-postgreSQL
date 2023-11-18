@@ -370,6 +370,7 @@ const withdrawCourse = async (
     offeredCourseSectionId: string;
   }
 ) => {
+  // check student data
   const studentInfo = await prisma.student.findFirst({
     where: {
       student_id: userId,
@@ -378,7 +379,7 @@ const withdrawCourse = async (
   if (!studentInfo) {
     throw new ApiError(httpStatus.NOT_FOUND, "Student doesn't found");
   }
-
+  // check registration data
   const semesterRegInfo = await prisma.semesterRegistration.findFirst({
     where: {
       status: SemesterStatus.ONGOING,
@@ -388,6 +389,7 @@ const withdrawCourse = async (
     throw new ApiError(httpStatus.NOT_FOUND, "semesterRegInfo doesn't found");
   }
 
+  // check courses
   const offeredCourse = await prisma.offeredCourse.findFirst({
     where: {
       id: payload.offeredCourseId,
@@ -412,6 +414,8 @@ const withdrawCourse = async (
       },
     });
 
+    // decrement enroll student data
+
     await transactionClient.offeredCourseSection.update({
       where: {
         id: payload.offeredCourseSectionId,
@@ -422,6 +426,7 @@ const withdrawCourse = async (
         },
       },
     });
+    // decrement student credit
     await transactionClient.studentSemesterRegistration.updateMany({
       where: {
         student: {
@@ -448,6 +453,7 @@ const withdrawCourse = async (
 const confirmRegistration = async (
   userId: string
 ): Promise<{ message: string }> => {
+  // check registration data
   const semesterRegInfo = await prisma.semesterRegistration.findFirst({
     where: {
       status: SemesterStatus.ONGOING,
@@ -456,7 +462,7 @@ const confirmRegistration = async (
   if (!semesterRegInfo) {
     throw new ApiError(httpStatus.NOT_FOUND, "semesterRegInfo doesn't found");
   }
-  console.log(semesterRegInfo);
+
   const studentSemesterRegistration =
     await prisma.studentSemesterRegistration.findFirst({
       where: {
