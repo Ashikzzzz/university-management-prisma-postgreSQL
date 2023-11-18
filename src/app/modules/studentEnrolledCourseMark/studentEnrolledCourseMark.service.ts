@@ -5,6 +5,7 @@ import {
 } from '@prisma/client/runtime/library';
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
+import { getGradeForMarksUtils } from './studentEnrolledCourseMark.utils';
 
 const prisma = new PrismaClient({
   errorFormat: 'minimal',
@@ -109,27 +110,13 @@ const updateMarks = async (payload: any) => {
     );
   }
 
-  let grade = '';
-
-  if (marks >= 0 && marks <= 39) {
-    grade = 'F';
-  } else if (marks >= 40 && marks <= 49) {
-    grade = 'D';
-  } else if (marks >= 51 && marks <= 59) {
-    grade = 'C';
-  } else if (marks >= 61 && marks <= 69) {
-    grade = 'B';
-  } else if (marks >= 71 && marks <= 79) {
-    grade = 'B+';
-  } else if (marks >= 80 && marks <= 100) {
-    grade = 'A+';
-  }
+  const gradeResult = getGradeForMarksUtils.getGradeForMarks(marks);
   const updateStudentMarks = await prisma.studentEnrolledCourseMark.update({
     where: {
       id: studentId,
     },
     data: {
-      grade,
+      grade: gradeResult.grade,
       marks,
     },
   });
