@@ -10,6 +10,8 @@ const prisma = new PrismaClient({
   errorFormat: 'minimal',
 });
 
+// create a course and preRequisite course
+
 const createCourse = async (data: ICourseCreateData): Promise<any> => {
   const { preRequisiteCourse, ...courseData } = data;
 

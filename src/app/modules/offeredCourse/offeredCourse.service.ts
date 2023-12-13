@@ -1,4 +1,6 @@
 import { OfferedCourse, Prisma, PrismaClient } from '@prisma/client';
+import httpStatus from 'http-status';
+import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
@@ -32,6 +34,13 @@ const createOfferedCourse = async (data: IOfferedCourseData) => {
           courseId,
         },
       });
+
+      if (isExist) {
+        throw new ApiError(
+          httpStatus.BAD_REQUEST,
+          'Offered course is already exist'
+        );
+      }
 
       if (!isExist) {
         const result = await prisma.offeredCourse.create({

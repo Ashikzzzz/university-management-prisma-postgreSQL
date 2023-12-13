@@ -209,6 +209,18 @@ const updateTotalMarks = async (payload: any) => {
       status: StudentEnrolledCourseStatus.COMPLETED,
     },
   });
+
+  // const grades = await prisma.studentEnrollerdCourse.findMany({
+  //   where: {
+  //     student: {
+  //       id: studentId,
+  //     },
+  //     status: StudentEnrolledCourseStatus.COMPLETED,
+  //   },
+  //   include: {
+  //     course: true,
+  //   },
+  // });
 };
 
 export const stuentEnrolledCourseMarkService = {
