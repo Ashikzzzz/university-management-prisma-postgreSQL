@@ -56,10 +56,12 @@ const createCourseClassSchedule = async (
 
     // check time and faculty is booked or not
 
-    if (newStart < existingEnd && newEnd > existingStart) {
+    if (
+      newStart < existingEnd &&
+      newEnd > existingStart &&
+      slot.faculty === newSlot.faculty
+    ) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Room is booked');
-    } else if (slot.faculty === newSlot.faculty) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'faculty is booked');
     }
   }
 

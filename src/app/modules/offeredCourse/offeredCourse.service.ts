@@ -55,6 +55,7 @@ const createOfferedCourse = async (data: IOfferedCourseData) => {
             course: true,
           },
         });
+        // push result
         finalResult.push(result);
       }
     }
