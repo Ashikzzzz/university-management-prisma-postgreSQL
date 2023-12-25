@@ -12,4 +12,6 @@ router.patch(
   stuentEnrolledCourseMarkController.updateTotalMarks
 );
 
+router.get('/', stuentEnrolledCourseMarkController.getAllFromDB);
+
 export const stuentEnrolledCourseMarkRoute = router;

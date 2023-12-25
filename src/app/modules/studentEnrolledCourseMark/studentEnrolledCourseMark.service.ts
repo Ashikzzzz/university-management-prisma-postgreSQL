@@ -1,6 +1,7 @@
 import {
   ExamType,
   PrismaClient,
+  StudentEnrolledCourseMark,
   StudentEnrolledCourseStatus,
 } from '@prisma/client';
 import {
@@ -10,6 +11,10 @@ import {
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
 import { getGradeForMarksUtils } from './studentEnrolledCourseMark.utils';
+import { IStudentEnrolledCourseMarkFilterRequest } from './studentEnrolledCourseMark.interface';
+import { IPaginationOptions } from '../../../interfaces/pagination';
+import { IGenericResponse } from '../../../interfaces/common';
+import { paginationHelpers } from '../../../helpers/paginationHelper';
 
 const prisma = new PrismaClient({
   errorFormat: 'minimal',
@@ -86,7 +91,6 @@ const createStudentEnrolledMark = async (
 
 // update student marks for final or mid
 const updateMarks = async (payload: any) => {
-  console.log('first', payload);
   const { studentId, academicSemesterId, marks, examType, courseId } = payload;
 
   const studentEnrolledCourseMarks =
@@ -223,8 +227,49 @@ const updateTotalMarks = async (payload: any) => {
   // });
 };
 
+const getAllFromDB = async (
+  filters: IStudentEnrolledCourseMarkFilterRequest,
+  options: IPaginationOptions
+): Promise<IGenericResponse<StudentEnrolledCourseMark[]>> => {
+  const { limit, page } = paginationHelpers.calculatePagination(options);
+
+  const marks = await prisma.studentEnrolledCourseMark.findMany({
+    where: {
+      student: {
+        id: filters.studentId,
+      },
+      academicSemester: {
+        id: filters.academicSemesterId,
+      },
+      studentEnrolledCourse: {
+        course: {
+          id: filters.courseId,
+        },
+      },
+    },
+    include: {
+      studentEnrolledCourse: {
+        include: {
+          course: true,
+        },
+      },
+      student: true,
+    },
+  });
+
+  return {
+    meta: {
+      total: marks.length,
+      page,
+      limit,
+    },
+    data: marks,
+  };
+};
+
 export const stuentEnrolledCourseMarkService = {
   createStudentEnrolledMark,
   updateMarks,
   updateTotalMarks,
+  getAllFromDB,
 };
