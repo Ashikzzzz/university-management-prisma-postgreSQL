@@ -192,8 +192,9 @@ const updateTotalMarks = async (payload: any) => {
       ?.marks || 0;
 
   const totalMarks = Math.ceil(midTermMark * 0.4) + Math.ceil(finalMark * 0.6);
-  const grade = getGradeForMarksUtils.getGradeForMarks(totalMarks);
+  const result = getGradeForMarksUtils.getGradeForMarks(totalMarks);
 
+  // update student mark at student enrolled course table
   await prisma.studentEnrollerdCourse.updateMany({
     where: {
       student: {
@@ -207,24 +208,64 @@ const updateTotalMarks = async (payload: any) => {
       },
     },
     data: {
-      grade: grade.grade,
-      point: grade.point,
+      grade: result.grade,
+      point: result.point,
       totalMarks: totalMarks,
       status: StudentEnrolledCourseStatus.COMPLETED,
     },
   });
 
-  // const grades = await prisma.studentEnrollerdCourse.findMany({
-  //   where: {
-  //     student: {
-  //       id: studentId,
-  //     },
-  //     status: StudentEnrolledCourseStatus.COMPLETED,
-  //   },
-  //   include: {
-  //     course: true,
-  //   },
-  // });
+  // find data from student enrolled course table
+  const grades = await prisma.studentEnrollerdCourse.findMany({
+    where: {
+      student: {
+        id: studentId,
+      },
+      status: StudentEnrolledCourseStatus.COMPLETED,
+    },
+    include: {
+      course: true,
+    },
+  });
+  const academicResult = await getGradeForMarksUtils.calcCGPAandGrade(grades);
+
+  // find data from student academic info table by student data
+  const studentAcademicInfoSearch = await prisma.studentAcademicInfo.findFirst({
+    where: {
+      student: {
+        id: studentId,
+      },
+    },
+  });
+
+  // if data available then update
+  if (studentAcademicInfoSearch) {
+    await prisma.studentAcademicInfo.update({
+      where: {
+        id: studentAcademicInfoSearch.id,
+      },
+      data: {
+        totalCompletedCredit: academicResult.totalCompletedCredit,
+        cgpa: academicResult.cgpa,
+      },
+    });
+  }
+  // if not have then create
+  else {
+    await prisma.studentAcademicInfo.create({
+      data: {
+        student: {
+          connect: {
+            id: studentId,
+          },
+        },
+        totalCompletedCredit: academicResult.totalCompletedCredit,
+        cgpa: academicResult.cgpa,
+      },
+    });
+  }
+
+  return grades;
 };
 
 const getAllFromDB = async (
