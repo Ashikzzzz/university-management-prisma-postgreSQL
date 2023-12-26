@@ -215,7 +215,7 @@ const updateTotalMarks = async (payload: any) => {
     },
   });
 
-  // find data from student enrolled course table
+  // find data from student enrolled course table which courses are completed
   const grades = await prisma.studentEnrollerdCourse.findMany({
     where: {
       student: {

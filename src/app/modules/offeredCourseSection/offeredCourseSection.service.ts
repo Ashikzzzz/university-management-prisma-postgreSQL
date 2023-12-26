@@ -26,7 +26,7 @@ const createCourseSection = async (
       'Failed to create. Must need to add a course'
     );
   }
-
+  data.semesterRegistrationId = isExistCourse.id;
   const result = await prisma.offeredCourseSection.create({
     data,
   });

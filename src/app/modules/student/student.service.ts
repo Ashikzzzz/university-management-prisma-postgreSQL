@@ -60,22 +60,7 @@ const getAllStudents = async (
     andConditions.length > 0 ? { AND: andConditions } : {};
 
   const result = await prisma.student.findMany({
-    where:
-      // OR: [
-      //   {
-      //     title: {
-      //       contains: searchTerm,
-      //       mode: 'insensitive',
-      //     },
-      //   },
-      //   {
-      //     code: {
-      //       contains: searchTerm,
-      //       mode: 'insensitive',
-      //     },
-      //   },
-      // ],
-      whereConditions,
+    where: whereConditions,
     skip,
     take: limit,
     orderBy:
@@ -135,10 +120,42 @@ const deleteStudent = async (id: string): Promise<Student> => {
   return result;
 };
 
+// my courses
+const myCourses = async (
+  authUserId: string,
+  filter: {
+    courseId?: string | undefined;
+    academicSemesterId?: string | undefined;
+  }
+) => {
+  if (!filter.academicSemesterId) {
+    const currentSemester = await prisma.academicSemester.findFirst({
+      where: {
+        isCurrent: true,
+      },
+    });
+    filter.academicSemesterId = currentSemester?.id;
+  }
+
+  const result = await prisma.studentEnrollerdCourse.findMany({
+    where: {
+      student: {
+        student_id: authUserId,
+      },
+      ...filter,
+    },
+    include: {
+      course: true,
+    },
+  });
+  return result;
+};
+
 export const studentService = {
   createStudent,
   getAllStudents,
   getAsingleStudent,
   updateAStudent,
   deleteStudent,
+  myCourses,
 };

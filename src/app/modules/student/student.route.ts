@@ -13,6 +13,14 @@ router.get('/:id', studentController.getAsingleStudent);
 // get all student
 router.get('/', studentController.getAllStudents);
 
+// my courses
+
+router.get(
+  '/my-courses',
+  auth(ENUM_USER_ROLE.STUDENT),
+  studentController.myCourses
+);
+
 // create student
 router.post(
   '/create-student',
