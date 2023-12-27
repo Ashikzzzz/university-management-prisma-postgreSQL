@@ -2,6 +2,8 @@ import express from 'express';
 import validateRequest from '../../middlewares/validateRequest';
 import { facultyController } from './faculty.controller';
 import { facultyZodValidation } from './faculty.validation';
+import auth from '../../middlewares/auth';
+import { ENUM_USER_ROLE } from '../../../enums/user';
 
 const router = express.Router();
 
@@ -37,5 +39,12 @@ router.patch('/:id', facultyController.updateAFaculty);
 
 // delete a faculty
 router.delete('/:id', facultyController.deleteFaculty);
+
+// my courses
+router.get(
+  '/my-courses',
+  auth(ENUM_USER_ROLE.FACULTY),
+  facultyController.myCourses
+);
 
 export const facultyRoute = router;

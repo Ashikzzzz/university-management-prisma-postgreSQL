@@ -179,6 +179,78 @@ const deleteCousesFromFaculty = async (
   return assignCoursesData;
 };
 
+// my courses
+const myCourses = async (
+  authUser: { userId: string; role: string },
+  filter: {
+    academicSemesterId?: string | null | undefined;
+    courseId?: string | null | undefined;
+  }
+) => {
+  if (!filter.academicSemesterId) {
+    const currentSemester = await prisma.academicSemester.findFirst({
+      where: {
+        isCurrent: true,
+      },
+    });
+    filter.academicSemesterId = currentSemester?.id;
+  }
+
+  const offeredCourseSection = await prisma.offeredCourseSection.findMany({
+    where: {
+      offeredCourseClassSchedule: {
+        some: {
+          faculty: {
+            faculty_id: authUser.userId,
+          },
+        },
+      },
+      offeredCourse: {
+        semesterRegistration: {
+          academicSemester: {
+            id: filter.academicSemesterId,
+          },
+        },
+      },
+    },
+    include: {
+      offeredCourse: {
+        include: {
+          course: true,
+        },
+      },
+    },
+  });
+
+  const courseSchedules = offeredCourseSection.reduce((acc: any, obj: any) => {
+    const course = obj.offeredCourse.course;
+    const calssSchedule = obj.offeredCourseClassSchedule;
+
+    const existingCourse = acc.find(
+      (item: any) => item.course?.id === course?.id
+    );
+
+    if (existingCourse) {
+      existingCourse.sections.push({
+        section: obj,
+        calssSchedule,
+      });
+    } else {
+      acc.push({
+        course,
+        sections: [
+          {
+            section: obj,
+            calssSchedule,
+          },
+        ],
+      });
+    }
+    return acc;
+  }, []);
+  return courseSchedules;
+};
+
 export const facultyService = {
   createFaculty,
   getAllFaculty,
@@ -187,4 +259,5 @@ export const facultyService = {
   deleteFaculty,
   assignCourseToFaculty,
   deleteCousesFromFaculty,
+  myCourses,
 };
