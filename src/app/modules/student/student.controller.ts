@@ -100,6 +100,18 @@ const getMyCourseSchedule = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get my academic performance
+const academicInfoData = catchAsync(async (req: Request, res: Response) => {
+  const user = (req as any).user;
+  const result = await studentService.academicInfoData(user.userId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Getting Successful',
+    data: result,
+  });
+});
+
 export const studentController = {
   createStudent,
   getAllStudents,
@@ -108,4 +120,5 @@ export const studentController = {
   deleteStudent,
   myCourses,
   getMyCourseSchedule,
+  academicInfoData,
 };

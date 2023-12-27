@@ -1,8 +1,14 @@
-import { Prisma, PrismaClient, Student } from '@prisma/client';
+import {
+  Prisma,
+  PrismaClient,
+  Student,
+  StudentEnrolledCourseStatus,
+} from '@prisma/client';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import { IStudentFilter } from './student.interface';
+import { StudentUtils } from './student.utils';
 
 const prisma = new PrismaClient({
   errorFormat: 'minimal',
@@ -215,6 +221,40 @@ const getMyCourseSchedule = async (
   return result;
 };
 
+// get my academic performance
+
+const academicInfoData = async (authUserId: string) => {
+  const academicInfo = await prisma.studentAcademicInfo.findFirst({
+    where: {
+      student: {
+        student_id: authUserId,
+      },
+    },
+  });
+  const enrolledCourses = await prisma.studentEnrollerdCourse.findMany({
+    where: {
+      student: {
+        student_id: authUserId,
+      },
+      status: StudentEnrolledCourseStatus.COMPLETED,
+    },
+    include: {
+      course: true,
+      academicSemester: true,
+    },
+    orderBy: {
+      createdAt: 'asc',
+    },
+  });
+  const groupByAcademicSemesterData =
+    StudentUtils.groupByAcademicSemester(enrolledCourses);
+
+  return {
+    academicInfo,
+    courses: groupByAcademicSemesterData,
+  };
+};
+
 export const studentService = {
   createStudent,
   getAllStudents,
@@ -223,4 +263,5 @@ export const studentService = {
   deleteStudent,
   myCourses,
   getMyCourseSchedule,
+  academicInfoData,
 };

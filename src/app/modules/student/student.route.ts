@@ -21,6 +21,13 @@ router.get(
   studentController.myCourses
 );
 
+// get my academic performance
+router.get(
+  '/my-academic-info',
+  auth(ENUM_USER_ROLE.STUDENT),
+  studentController.academicInfoData
+);
+
 // get my course schedule
 router.get(
   '/get-course-routine',
