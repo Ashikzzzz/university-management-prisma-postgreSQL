@@ -21,6 +21,13 @@ router.get(
   studentController.myCourses
 );
 
+// get my course schedule
+router.get(
+  '/get-course-routine',
+  auth(ENUM_USER_ROLE.STUDENT),
+  studentController.getMyCourseSchedule
+);
+
 // create student
 router.post(
   '/create-student',
