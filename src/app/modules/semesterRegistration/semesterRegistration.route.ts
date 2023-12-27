@@ -20,6 +20,13 @@ router.get(
   semesterRegistrationController.getMyRegistration
 );
 
+// get my registration courses
+router.get(
+  '/get-my-registration-courses',
+  auth(ENUM_USER_ROLE.STUDENT),
+  semesterRegistrationController.getMyRegistrationCourses
+);
+
 // confirm registration
 router.post(
   '/confirm-registration',
