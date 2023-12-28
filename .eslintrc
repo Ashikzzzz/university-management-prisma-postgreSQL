@@ -5,20 +5,20 @@
     "sourceType": "module"
   },
   "plugins": ["@typescript-eslint"],
+  // HERE
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "prettier"
   ],
+
   "rules": {
-    "no-unused-vars": "error",
-    "prefer-const": "error",
-    "no-unused-expressions": "error",
-    "no-undef": "error",
-    "no-console": "off",
+    "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/consistent-type-definitions": ["error", "type"],
-    "@typescript-eslint/explicit-module-boundary-types": "off"
+    "no-unused-expressions": "warn",
+    "no-undef": "error"
   },
+
   "env": {
     "browser": true,
     "es2021": true,
