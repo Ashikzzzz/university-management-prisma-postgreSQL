@@ -5,6 +5,7 @@ import { IPaginationOptions } from '../../../interfaces/pagination';
 import { IAcademicSemesterFilter } from './academicSemester.interface';
 import ApiError from '../../../errors/ApiError';
 import httpStatus from 'http-status';
+import { RedisClient } from '../../../shared/redis';
 
 const prisma = new PrismaClient({
   errorFormat: 'minimal',
@@ -22,9 +23,18 @@ const createAcademicSemester = async (
     const result = await prisma.academicSemester.create({
       data: payload,
     });
+
+    // data publish on redis
+    if (result) {
+      await RedisClient.publish(
+        'academic-semester.create',
+        JSON.stringify(result)
+      );
+    }
+
     return result;
   } else {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid Code');
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid semester Code');
   }
 };
 
