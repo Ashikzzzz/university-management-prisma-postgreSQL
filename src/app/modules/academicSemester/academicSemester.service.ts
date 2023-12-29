@@ -3,6 +3,8 @@ import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import { IAcademicSemesterFilter } from './academicSemester.interface';
+import ApiError from '../../../errors/ApiError';
+import httpStatus from 'http-status';
 
 const prisma = new PrismaClient({
   errorFormat: 'minimal',
@@ -10,12 +12,20 @@ const prisma = new PrismaClient({
 
 // create academic semester
 const createAcademicSemester = async (
-  academicSemesterData: AcademicSemester
+  payload: AcademicSemester
 ): Promise<AcademicSemester> => {
-  const result = await prisma.academicSemester.create({
-    data: academicSemesterData,
-  });
-  return result;
+  if (
+    (payload.title === 'Spring' && payload.code === '01') ||
+    (payload.title === 'Autumn' && payload.code === '02') ||
+    (payload.title === 'Fall' && payload.code === '03')
+  ) {
+    const result = await prisma.academicSemester.create({
+      data: payload,
+    });
+    return result;
+  } else {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid Code');
+  }
 };
 
 // get all semester

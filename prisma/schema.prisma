@@ -28,6 +28,8 @@ model AcademicSemester {
   @@map("academic_semesters")
 }
 
+
+
 model AcademicFaculty {
    id String @id @default(uuid())
    title String
